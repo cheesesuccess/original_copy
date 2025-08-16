@@ -52,3 +52,4 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js', './lib/*'],
 }
+
