@@ -1,39 +1,3 @@
-/**
- * Rewrite all imports that start with "~/"
- * to relative POSIX paths from the current file.
- * This runs BEFORE vite build.
- */
-import fs from 'node:fs'
-import path from 'node:path'
-
-const ROOT = process.cwd()
-const SRC = path.resolve(ROOT, 'src')
-
-const exts = ['', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.css.ts', '/index.ts', '/index.tsx', '/index.js', '/index.jsx']
-
-function listFiles(dir) {
-  /** @type {string[]} */
-  const out = []
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name)
-    if (entry.isDirectory()) {
-      out.push(...listFiles(full))
-    } else if (/\.(ts|tsx|js|jsx|mjs|css\.ts)$/.test(entry.name)) {
-      out.push(full)
-    }
-  }
-  return out
-}
-
-function resolveWithExtensions(base) {
-  for (const ext of exts) {
-    const p = base + ext
-    if (fs.existsSync(p)) return p
-  }
-  return null
-}
-
-function toPosix(p) { return p.split(path.sep).join('/') }
 
 function rewriteFile(absFile) {
   const dir = path.dirname(absFile)
