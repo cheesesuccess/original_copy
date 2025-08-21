@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: cheesesuccess-dynamic
+    env: node
+    rootDir: .
+    buildCommand: npm run render-build
+    startCommand: npm run render-start
+    envVars:
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
+      - key: NODE_VERSION
+        value: "18"
