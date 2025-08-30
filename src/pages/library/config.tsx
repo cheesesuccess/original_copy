@@ -1,7 +1,10 @@
+import { useNavigate } from 'solid-app-router'
 import { JSX } from 'solid-js'
-import { MusicItemKey } from '~/types/types'
-import { IconType } from '~/components/icon/icon'
 import * as configs from '~/base-page-configs'
+import { Icon, IconType } from '~/components/icon/icon'
+import { useModals } from '~/components/modals/modals'
+import { MusicItemKey } from '~/types/types'
+import * as styles from './library.css'
 
 interface SortItem {
   name: string
@@ -18,7 +21,37 @@ export interface LibraryPageConfig extends configs.BaseConfig {
 const SORT_NAME = { name: 'A to Z', key: MusicItemKey.NAME } as const
 const SORT_YEAR = { name: 'Year', key: MusicItemKey.YEAR } as const
 
+const CreateNewPlaylistButton = () => {
+  const modals = useModals()
+
+  return (
+    <button
+      class={styles.outlinedButton}
+      onClick={() => {
+        modals.createOrRenamePlaylist.show({ type: 'create' })
+      }}
+    >
+      <Icon icon='plus' />
+      New playlist
+    </button>
+  )
+}
+
+
+
 export const CONFIG: readonly LibraryPageConfig[] = [
+  {
+    ...configs.BASE_TRACKS_CONFIG,
+    icon: 'musicNoteOutline',
+    iconSelected: 'musicNote',
+    sortOptions: [
+      SORT_NAME,
+      { name: 'Album', key: MusicItemKey.ALBUM },
+      { name: 'Artists', key: MusicItemKey.ARTISTS },
+      SORT_YEAR,
+      { name: 'Duration', key: MusicItemKey.DURATION },
+    ],
+  },
   {
     ...configs.BASE_ALBUMS_CONFIG,
     icon: 'albumOutline',
@@ -30,12 +63,30 @@ export const CONFIG: readonly LibraryPageConfig[] = [
     ],
   },
   {
-    ...configs.BASE_HISTORY_CONFIG,
-    icon: 'playlistPlay',
-    iconSelected: 'playlistPlay',
+    ...configs.BASE_ARTISTS_CONFIG,
+    icon: 'personOutline',
+    iconSelected: 'person',
+    sortOptions: [SORT_NAME],
+  },
+  {
+    ...configs.BASE_PLAYLISTS_CONFIG,
+    icon: 'playlist',
+    iconSelected: 'playlist',
+    actions: CreateNewPlaylistButton,
     sortOptions: [
-      { name: 'Most recent', key: MusicItemKey.NAME },
+      SORT_NAME,
+      { name: 'Date created', key: MusicItemKey.DATE_CREATED },
     ],
+    component: (props) => {
+      const navigate = useNavigate()
+
+      return (
+        <configs.BASE_PLAYLISTS_CONFIG.component
+          {...props}
+          onItemClick={(id) => navigate(`/playlist/${id}`)}
+        />
+      )
+    },
   },
 ] as const
 
