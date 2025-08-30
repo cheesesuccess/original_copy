@@ -1,82 +1,88 @@
-// https://whatwebcando.today/articles/handling-service-worker-updates/
-import swURL from 'service-worker:./sw'
-
-const waitForPageToLoad = async () => {
-  if (document.readyState === 'loading') {
-    return new Promise((resolve) => {
-      window.addEventListener('load', resolve, { once: true })
-    })
-  }
-  return Promise.resolve()
+interface FileLegacy {
+  type: 'file'
+  file: File
 }
 
-export interface Options {
-  onNeedRefresh: (updateSw: () => void) => void
+interface FileHandle {
+  type: 'fileRef'
+  file: FileSystemFileHandle
 }
 
-export const registerServiceWorker = async (options: Options) => {
-  // Allow service worker registration in development for offline testing
-  // Comment out the dev mode check to enable offline functionality in development
-  // if (import.meta.env.DEV) {
-  //   return
-  // }
+interface FileUrl {
+  type: 'url'
+  url: string
+}
 
-  await waitForPageToLoad()
+export type FileWrapper = FileLegacy | FileHandle | FileUrl
 
-  const { serviceWorker } = navigator
-  const registration = await serviceWorker.register(swURL, {
-    scope: '/',
-  })
+export type ImageType = Blob | string | undefined
 
-  const needsRefresh = (reg: ServiceWorkerRegistration) => {
-    const updateSw = () => {
-      const { waiting } = reg
-      if (waiting) {
-        waiting.postMessage('skip-waiting')
-      }
-    }
+export const MusicItemType = {
+  TRACK: 0,
+  ALBUM: 1,
+  ARTIST: 2,
+  PLAYLIST: 3,
+  HISTORY: 4,
+} as const
 
-    options.onNeedRefresh(updateSw)
-  }
+export type MusicItemType = typeof MusicItemType[keyof typeof MusicItemType]
 
-  // ensure the case when the updatefound event was missed is also handled
-  // by re-invoking the prompt when there's a waiting Service Worker
-  if (registration.waiting) {
-    needsRefresh(registration)
-  }
+export const MusicItemKey = {
+  NAME: 'name',
+  ARTISTS: 'artists',
+  ALBUM: 'album',
+  YEAR: 'year',
+  DURATION: 'duration',
+  DATE_CREATED: 'dateCreated',
+} as const
 
-  let firstLoad = false
+export type MusicItemKey = typeof MusicItemKey[keyof typeof MusicItemKey]
 
-  registration.addEventListener('updatefound', () => {
-    const { installing } = registration
-    if (!installing) {
-      return
-    }
+export interface BaseMusicItem {
+  id: string
+  type: MusicItemType
+  name: string
+}
 
-    // wait until the new Service worker is actually installed (ready to take over)
-    installing.addEventListener('statechange', () => {
-      if (registration.waiting) {
-        if (navigator.serviceWorker.controller) {
-          // if there's an existing controller (previous Service Worker), show the prompt
-          needsRefresh(registration)
-        } else {
-          firstLoad = true
-        }
-      }
-    })
-  })
+export interface UnknownTrack {
+  name: string
+  album?: string
+  artists: string[]
+  year?: string
+  duration: number
+  genre: string[]
+  trackNo?: number
+  trackOf?: number
+  image?: ImageType
+  fileWrapper: FileWrapper
+  primaryColor?: number
+  description?: string
+  topics?: string[]
+}
 
-  let refreshing = false
-  // detect controller change and refresh the page
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (firstLoad) {
-      firstLoad = false
-      return
-    }
+export interface Track extends BaseMusicItem, UnknownTrack {
+  type: typeof MusicItemType.TRACK
+}
 
-    if (!refreshing) {
-      window.location.reload()
-      refreshing = true
-    }
-  })
+export interface BaseMusicItemWithTrackIds extends BaseMusicItem {
+  trackIds: string[]
+}
+
+// For Album and Artists id and name are the same thing,
+// but for consistency still include both.
+export interface Album extends BaseMusicItemWithTrackIds {
+  type: typeof MusicItemType.ALBUM
+  artists: string[]
+  year?: string
+  image?: ImageType
+  description?: string
+}
+
+export interface Artist extends BaseMusicItemWithTrackIds {
+  type: typeof MusicItemType.ARTIST
+}
+
+export interface Playlist extends BaseMusicItemWithTrackIds {
+  type: typeof MusicItemType.PLAYLIST
+  dateCreated: number
 }
