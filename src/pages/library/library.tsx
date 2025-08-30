@@ -1,18 +1,18 @@
-import { NavLink, Outlet, useMatch, useNavigate } from 'solid-app-router'
-import { For, JSXElement, Show, createMemo, createSignal } from 'solid-js'
-import { AppTopBar } from '~/components/app-top-bar/app-top-bar'
+import { createMemo, createSignal, For, JSXElement, Show } from 'solid-js'
+import { Outlet, useNavigate, NavLink, useMatch } from 'solid-app-router'
 import { CSSTransition } from '~/components/css-transition/css-transition'
-import { IconButton } from '~/components/icon-button/icon-button'
 import { Icon } from '~/components/icon/icon'
+import { IconButton } from '~/components/icon-button/icon-button'
 import { useMenu } from '~/components/menu/menu'
-import { MessageBanner } from '~/components/message-banner/message-banner'
-import { Scaffold } from '~/components/scaffold/scaffold'
-import { createMediaQuery } from '~/helpers/hooks/create-media-query'
-import { useMapRouteToValue } from '~/helpers/router-match'
 import { useEntitiesStore, useLibraryStore } from '~/stores/stores'
+import { MessageBanner } from '~/components/message-banner/message-banner'
+import { LibraryPageConfig, CONFIG } from './config'
 import { MusicItemType } from '~/types/types'
-import { IS_DEVICE_A_MOBILE, clx } from '~/utils'
-import { CONFIG, LibraryPageConfig } from './config'
+import { useMapRouteToValue } from '~/helpers/router-match'
+import { Scaffold } from '~/components/scaffold/scaffold'
+import { AppTopBar } from '~/components/app-top-bar/app-top-bar'
+import { createMediaQuery } from '~/helpers/hooks/create-media-query'
+import { clx, IS_DEVICE_A_MOBILE } from '~/utils'
 import * as styles from './library.css'
 
 const [installEvent, setInstallEvent] = createSignal<BeforeInstallPromptEvent>()
@@ -41,10 +41,6 @@ const TopBar = (props: TopBar) => {
           name: 'About',
           action: () => navigate('/about'),
         },
-        {
-          name: 'Coplay',
-          action: () => navigate('/room'),
-        },
       ],
       e.target as HTMLElement,
       {
@@ -59,10 +55,8 @@ const TopBar = (props: TopBar) => {
   const routeMatch = useMatch(() => '/library/:page')
   const selectedPage = createMemo(() => {
     const PAGE_TO_TYPE_MAP = {
-      tracks: MusicItemType.TRACK,
       albums: MusicItemType.ALBUM,
-      artists: MusicItemType.ARTIST,
-      playlists: MusicItemType.PLAYLIST,
+      history: MusicItemType.HISTORY,
     }
 
     const page = routeMatch()?.params.page as keyof typeof PAGE_TO_TYPE_MAP
@@ -176,10 +170,8 @@ const Library = (): JSXElement => {
   const isMedium = createMediaQuery('(max-width: 500px)')
 
   const selectedPage = useMapRouteToValue({
-    '/library/tracks': () => MusicItemType.TRACK,
     '/library/albums': () => MusicItemType.ALBUM,
-    '/library/artists': () => MusicItemType.ARTIST,
-    '/library/playlists': () => MusicItemType.PLAYLIST,
+    '/library/history': () => MusicItemType.HISTORY,
   })
 
   const pageConfig = createMemo(
