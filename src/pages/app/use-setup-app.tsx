@@ -1,18 +1,18 @@
 import { createEffect } from 'solid-js'
 import { setElementVars } from '@vanilla-extract/dynamic'
+// Removed: import { registerServiceWorker } from '../../sw/register-sw'
 import { useAudioPlayer } from '../../audio/create-audio-player'
 import { usePlayerStore } from '../../stores/stores'
 import { installGlobalRipple } from '../../helpers/ripple/install-global-ripple'
 import { useDarkThemeEnabled } from '../../utils'
 import { colorsTheme } from '~/styles/vars.css'
 import * as styles from './app.css'
-import { toast } from '~/components/toast/toast'
+// Removed: import { toast } from '~/components/toast/toast'
 
 export const useSetupApp = (): void => {
   useAudioPlayer()
 
   const [playerState] = usePlayerStore()
-
   const isDarkTheme = useDarkThemeEnabled()
 
   const titlebarElement = document.querySelector(
@@ -22,7 +22,6 @@ export const useSetupApp = (): void => {
   createEffect(() => {
     const isDark = isDarkTheme()
     const argb = playerState.activeTrack?.primaryColor
-
     const doc = document.documentElement
 
     if (argb === undefined) {
@@ -44,3 +43,8 @@ export const useSetupApp = (): void => {
       titlebarElement.content = scheme.surface
     })
   })
+
+  // Removed service worker registration block
+
+  installGlobalRipple(styles.interactable)
+}
