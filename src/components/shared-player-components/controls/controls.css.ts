@@ -5,9 +5,8 @@ export const controls = style([
   sharedStyles.actions,
   style({
     gridArea: 'controls',
-    justifyContent: 'center',
-    gap: '8px',
-    display: 'flex',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
   }),
 ])
 
@@ -31,33 +30,20 @@ export const enabledIndicator = style({
   },
 })
 
-const baseControlButton = style([
+export const playPauseButton = style([
   sharedStyles.filledButton,
   style({
+    width: '72px',
+    borderRadius: '22px',
     height: '44px',
     padding: 0,
     flexShrink: 0,
-    borderRadius: '22px',
-    flex: 1,
     '@media': {
       '(max-width: 300px)': {
+        width: '44px',
         height: '44px',
       },
     },
-  }),
-])
-
-export const playPauseButton = style([
-  baseControlButton,
-  style({
-    // Play/pause button specific styles if needed
-  }),
-])
-
-export const seekBackButton = style([
-  baseControlButton,
-  style({
-    // Seek back button specific styles if needed
   }),
 ])
 
