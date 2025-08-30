@@ -3,55 +3,113 @@ import { defineConfig } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { createHtmlPlugin } from 'vite-plugin-html'
+// import { ViteWebfontDownload } from 'vite-plugin-webfont-dl' // Removed - no longer needed
+import manifest from './package.json'
 import { mangleClassNames } from './lib/vite-mangle-classnames'
 import { injectScriptsToHtmlDuringBuild } from './lib/vite-inject-scripts-to-html'
+import { serviceWorker } from './lib/vite-service-worker'
 
-// NOTE: If this is a user/organization site (https://<user>.github.io/), keep base: '/'.
-// If it's a project site (https://<user>.github.io/<repo>/), set base: '/<repo>/'.
+const createMScreenshot = (name: string, sizes: string) => ({
+  sizes,
+  src: `/screenshots/${name}.webp`,
+  type: 'image/webp',
+})
+
 export default defineConfig({
+  // Set base path for GitHub Pages deployment
   base: '/',
-
   resolve: {
     alias: {
       '~': path.resolve(__dirname, './src'),
-      // Replace any usage of the virtual PWA register with a no-op stub.
-      'virtual:pwa-register': path.resolve(
-        __dirname,
-        './src/sw/virtual-pwa-register-stub.ts',
-      ),
     },
   },
-
   build: {
     target: 'esnext',
+    polyfillDynamicImport: false,
+    polyfillModulePreload: false,
     cssCodeSplit: false,
-    sourcemap: true,        // helpful if anything breaks in production
-    minify: 'esbuild',      // safer & faster than terser for most apps
+    minify: 'terser',
+    terserOptions: {
+      output: {
+        comments: false,
+      },
+      module: true,
+      compress: {
+        passes: 3,
+        unsafe_math: true,
+        unsafe_methods: true,
+        unsafe_arrows: true,
+      },
+      mangle: {
+        properties: {
+          regex: /^_/,
+        },
+      },
+    },
     rollupOptions: {
       output: {
-        manualChunks: undefined, // single bundle (matches your previous intent)
+        // Disable vendor chunk.
+        manualChunks: undefined,
         preferConst: true,
       },
     },
   },
-
   plugins: [
-    createHtmlPlugin({ minify: true }),
-
-    // Inject early scripts: keep the unsupported-browser guard,
-    // and also a tiny runtime that unregisters existing SWs
-    // and blocks future registrations.
-    injectScriptsToHtmlDuringBuild({
-      input: [
-        './src/disable-app-if-not-supported.ts',
-        './src/quick-no-sw.ts', // make sure this file exists
-      ],
+    createHtmlPlugin({
+      minify: true,
     }),
-
+    // Vite always bundles or imports all scripts into one file.
+    // In unsupported browsers we want to display error message about it,
+    // but because everything is bundled into one file, main app bundle
+    // fails to load because of syntax errors and no message is displayed.
+    // This plugin fixes that by emiting script separetly
+    // and including it inside html.
+    injectScriptsToHtmlDuringBuild({
+      input: ['./src/disable-app-if-not-supported.ts'],
+    }),
+    // If https://github.com/seek-oss/vanilla-extract/discussions/222 is ever implemented,
+    // this plugin can be replaced.
     mangleClassNames(),
     vanillaExtractPlugin(),
-    solidPlugin({ hot: false }),
-
-    // (Intentionally no serviceWorker(...) plugin here)
+    solidPlugin({
+      hot: false,
+    }),
+    // ViteWebfontDownload plugin removed to eliminate Google Fonts dependency
+    // Now using system fonts for better offline performance
+    serviceWorker({
+      manifest: {
+        short_name: 'Osho',
+        name: 'Osho Digital Library',
+        start_url: './',
+        scope: './',
+        theme_color: '#1a1a1a',
+        background_color: '#1a1a1a',
+        display: 'standalone',
+        orientation: 'portrait',
+        description: manifest.description,
+        icons: [
+          {
+            src: '/icons/icon_responsive.svg',
+            type: 'image/svg+xml',
+            sizes: 'any',
+            purpose: 'any',
+          },
+          {
+            src: '/icons/icon_maskable.svg',
+            type: 'image/svg+xml',
+            sizes: 'any',
+            purpose: 'maskable',
+          },
+        ],
+        screenshots: [
+          createMScreenshot('small_1', '1079x1919'),
+          createMScreenshot('small_2', '1079x1919'),
+          createMScreenshot('small_3', '1079x1919'),
+          createMScreenshot('medium_1', '1276x960'),
+          createMScreenshot('medium_2', '1276x960'),
+          createMScreenshot('medium_3', '1276x960'),
+        ],
+      },
+    }),
   ],
 })
