@@ -40,6 +40,16 @@ const CreateNewPlaylistButton = () => {
 
 
 export const CONFIG: readonly LibraryPageConfig[] = [
+{
+    ...configs.BASE_ALBUMS_CONFIG,
+    icon: 'albumOutline',
+    iconSelected: 'album',
+    sortOptions: [
+      SORT_NAME,
+      { name: 'Artists', key: MusicItemKey.ARTISTS },
+      SORT_YEAR,
+    ],
+  },
   {
     ...configs.BASE_TRACKS_CONFIG,
     icon: 'musicNoteOutline',
@@ -50,16 +60,6 @@ export const CONFIG: readonly LibraryPageConfig[] = [
       { name: 'Artists', key: MusicItemKey.ARTISTS },
       SORT_YEAR,
       { name: 'Duration', key: MusicItemKey.DURATION },
-    ],
-  },
-  {
-    ...configs.BASE_ALBUMS_CONFIG,
-    icon: 'albumOutline',
-    iconSelected: 'album',
-    sortOptions: [
-      SORT_NAME,
-      { name: 'Artists', key: MusicItemKey.ARTISTS },
-      SORT_YEAR,
     ],
   },
   {
