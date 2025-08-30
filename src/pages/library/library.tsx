@@ -55,8 +55,10 @@ const TopBar = (props: TopBar) => {
   const routeMatch = useMatch(() => '/library/:page')
   const selectedPage = createMemo(() => {
     const PAGE_TO_TYPE_MAP = {
+      tracks: MusicItemType.TRACK,
       albums: MusicItemType.ALBUM,
-      history: MusicItemType.HISTORY,
+      artists: MusicItemType.ARTIST,
+      playlists: MusicItemType.PLAYLIST,
     }
 
     const page = routeMatch()?.params.page as keyof typeof PAGE_TO_TYPE_MAP
@@ -170,8 +172,10 @@ const Library = (): JSXElement => {
   const isMedium = createMediaQuery('(max-width: 500px)')
 
   const selectedPage = useMapRouteToValue({
+    '/library/tracks': () => MusicItemType.TRACK,
     '/library/albums': () => MusicItemType.ALBUM,
-    '/library/history': () => MusicItemType.HISTORY,
+    '/library/artists': () => MusicItemType.ARTIST,
+    '/library/playlists': () => MusicItemType.PLAYLIST,
   })
 
   const pageConfig = createMemo(
