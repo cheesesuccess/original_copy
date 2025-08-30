@@ -1,11 +1,12 @@
 import { VoidComponent } from 'solid-js'
+import { TracksList } from './components/entities-lists/tracks-list/tracks-list'
+import { MusicItemType } from './types/types'
+import { PlaylistList } from './components/entities-lists/playlists-list/playlists-list'
 import {
   AlbumsGrid,
   ArtistsGrid,
 } from './components/entities-lists/albums-artists-grids'
-import { PlaylistList } from './components/entities-lists/playlists-list/playlists-list'
-import { TracksList } from './components/entities-lists/tracks-list/tracks-list'
-import { MusicItemType } from './types/types'
+import { HistoryList } from './components/entities-lists/history-list/history-list'
 
 export interface BaseListProps {
   items: readonly string[]
@@ -44,4 +45,11 @@ export const BASE_PLAYLISTS_CONFIG = {
   title: 'Playlists',
   type: MusicItemType.PLAYLIST,
   component: PlaylistList,
+} as const
+
+export const BASE_HISTORY_CONFIG = {
+  path: 'history',
+  title: 'History',
+  type: MusicItemType.HISTORY,
+  component: HistoryList,
 } as const
