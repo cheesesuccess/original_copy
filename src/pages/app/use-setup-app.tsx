@@ -1,6 +1,5 @@
 import { createEffect } from 'solid-js'
 import { setElementVars } from '@vanilla-extract/dynamic'
-import { registerServiceWorker } from '../../sw/register-sw'
 import { useAudioPlayer } from '../../audio/create-audio-player'
 import { usePlayerStore } from '../../stores/stores'
 import { installGlobalRipple } from '../../helpers/ripple/install-global-ripple'
@@ -45,23 +44,3 @@ export const useSetupApp = (): void => {
       titlebarElement.content = scheme.surface
     })
   })
-
-  registerServiceWorker({
-    onNeedRefresh(updateSW) {
-      toast({
-        message: 'An app update is available',
-        duration: false,
-        controls: [
-          {
-            title: 'Reload',
-            action: () => {
-              updateSW()
-            },
-          },
-        ],
-      })
-    },
-  })
-
-  installGlobalRipple(styles.interactable)
-}
