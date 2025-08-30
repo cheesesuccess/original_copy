@@ -3,53 +3,48 @@ import { defineConfig } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { createHtmlPlugin } from 'vite-plugin-html'
-// import { ViteWebfontDownload } from 'vite-plugin-webfont-dl'
-import manifest from './package.json'
 import { mangleClassNames } from './lib/vite-mangle-classnames'
 import { injectScriptsToHtmlDuringBuild } from './lib/vite-inject-scripts-to-html'
-//  Removed: import { serviceWorker } from './lib/vite-service-worker'
 
-const createMScreenshot = (name: string, sizes: string) => ({
-  sizes,
-  src: `/screenshots/${name}.webp`,
-  type: 'image/webp',
-})
-
+// NOTE: If this is a user/organization site (https://<user>.github.io/), keep base: '/'.
+// If it's a project site (https://<user>.github.io/<repo>/), set base: '/<repo>/'.
 export default defineConfig({
-  // Leave this exactly as you’re currently using (root or /repo/).
   base: '/',
+
   resolve: {
     alias: {
       '~': path.resolve(__dirname, './src'),
+      // Replace any usage of the virtual PWA register with a no-op stub.
+      'virtual:pwa-register': path.resolve(
+        __dirname,
+        './src/sw/virtual-pwa-register-stub.ts',
+      ),
     },
   },
+
   build: {
     target: 'esnext',
-    polyfillDynamicImport: false,
-    polyfillModulePreload: false,
     cssCodeSplit: false,
-    minify: 'terser',
-    terserOptions: {
-      output: { comments: false },
-      module: true,
-      compress: { passes: 3, unsafe_math: true, unsafe_methods: true, unsafe_arrows: true },
-      mangle: { properties: { regex: /^_/ } },
-    },
+    sourcemap: true,        // helpful if anything breaks in production
+    minify: 'esbuild',      // safer & faster than terser for most apps
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        manualChunks: undefined, // single bundle (matches your previous intent)
         preferConst: true,
       },
     },
   },
+
   plugins: [
     createHtmlPlugin({ minify: true }),
 
-    // Inject both: 1) unsupported-browser guard, 2) SW unregistration script
+    // Inject early scripts: keep the unsupported-browser guard,
+    // and also a tiny runtime that unregisters existing SWs
+    // and blocks future registrations.
     injectScriptsToHtmlDuringBuild({
       input: [
         './src/disable-app-if-not-supported.ts',
-        './src/sw-unregister.ts', //  added
+        './src/quick-no-sw.ts', // make sure this file exists
       ],
     }),
 
@@ -57,6 +52,6 @@ export default defineConfig({
     vanillaExtractPlugin(),
     solidPlugin({ hot: false }),
 
-    //  Removed the serviceWorker(...) plugin block entirely
+    // (Intentionally no serviceWorker(...) plugin here)
   ],
 })
