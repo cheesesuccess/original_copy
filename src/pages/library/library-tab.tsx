@@ -16,10 +16,10 @@ export const LibraryPage: VoidComponent<LibraryPageConfig> = (props) => {
 
   const itemsSelector = () => {
     switch (props.type) {
-      case MusicItemType.TRACK:
-        return dataState.tracks
       case MusicItemType.ALBUM:
         return dataState.albums
+      case MusicItemType.TRACK:
+        return dataState.tracks
       case MusicItemType.ARTIST:
         return dataState.artists
       case MusicItemType.PLAYLIST:
