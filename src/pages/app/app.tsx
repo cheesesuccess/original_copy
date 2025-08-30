@@ -1,7 +1,7 @@
 import { useIsRouting, useMatch, useRoutes } from 'solid-app-router'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '~/firebase/firebase'
-import { useNavigate, useMatch } from 'solid-app-router'
+import { useNavigate } from 'solid-app-router'
 
 import { createEffect, createMemo, createSignal, Suspense } from 'solid-js'
 import { MiniPlayer } from '~/components/mini-player/mini-player'
