@@ -15,11 +15,9 @@ export interface Options {
 }
 
 export const registerServiceWorker = async (options: Options) => {
-  // Allow service worker registration in development for offline testing
-  // Comment out the dev mode check to enable offline functionality in development
-  // if (import.meta.env.DEV) {
-  //   return
-  // }
+  if (import.meta.env.DEV) {
+    return
+  }
 
   await waitForPageToLoad()
 
