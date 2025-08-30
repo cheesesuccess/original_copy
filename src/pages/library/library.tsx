@@ -203,7 +203,7 @@ const Library = (): JSXElement => {
       }
     >
       <Show
-        when={Object.keys(entities.albums).length}
+        when={Object.keys(entities.tracks).length}
         fallback={
           <MessageBanner
             title='Your Library is empty'
