@@ -1,18 +1,19 @@
 import { createEffect } from 'solid-js'
 import { setElementVars } from '@vanilla-extract/dynamic'
-// Removed: import { registerServiceWorker } from '../../sw/register-sw'
+import { registerServiceWorker } from '../../sw/register-sw'
 import { useAudioPlayer } from '../../audio/create-audio-player'
 import { usePlayerStore } from '../../stores/stores'
 import { installGlobalRipple } from '../../helpers/ripple/install-global-ripple'
 import { useDarkThemeEnabled } from '../../utils'
 import { colorsTheme } from '~/styles/vars.css'
 import * as styles from './app.css'
-// Removed: import { toast } from '~/components/toast/toast'
+import { toast } from '~/components/toast/toast'
 
 export const useSetupApp = (): void => {
   useAudioPlayer()
 
   const [playerState] = usePlayerStore()
+
   const isDarkTheme = useDarkThemeEnabled()
 
   const titlebarElement = document.querySelector(
@@ -22,6 +23,7 @@ export const useSetupApp = (): void => {
   createEffect(() => {
     const isDark = isDarkTheme()
     const argb = playerState.activeTrack?.primaryColor
+
     const doc = document.documentElement
 
     if (argb === undefined) {
@@ -44,7 +46,22 @@ export const useSetupApp = (): void => {
     })
   })
 
-  // Removed service worker registration block
+  registerServiceWorker({
+    onNeedRefresh(updateSW) {
+      toast({
+        message: 'An app update is available',
+        duration: false,
+        controls: [
+          {
+            title: 'Reload',
+            action: () => {
+              updateSW()
+            },
+          },
+        ],
+      })
+    },
+  })
 
   installGlobalRipple(styles.interactable)
 }
