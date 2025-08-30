@@ -17,7 +17,7 @@ const createMScreenshot = (name: string, sizes: string) => ({
 
 export default defineConfig({
   // Set base path for GitHub Pages deployment
-  base: '/cheesesuccess.github.io/',
+  base: '/',
   resolve: {
     alias: {
       '~': path.resolve(__dirname, './src'),
@@ -113,4 +113,5 @@ export default defineConfig({
     }),
   ],
 })
+
 
