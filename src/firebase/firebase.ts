@@ -7,12 +7,12 @@ import { initializeApp, getApps } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '<YOUR_API_KEY>',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '<YOUR_PROJECT>.firebaseapp.com',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '<YOUR_PROJECT_ID>',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || '<YOUR_PROJECT>.appspot.com',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '<SENDER_ID>',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || '<APP_ID>',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyC63LVrCNZ2mk8t3jbqvpbDDErdXasu0Nc',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'myfirst-4103c.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'myfirst-4103c',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'myfirst-4103c.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '630575055900',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:630575055900:web:85a0470b7b15dcf1174bd9',
 }
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig)
