@@ -56,6 +56,9 @@ export default function SettingsPage() {
         </div>
       </Show>
 
+
+
+
       {/* SUBSCRIBE CARD */}
       <section style={{
         background: '#fbf7ff',
@@ -67,8 +70,38 @@ export default function SettingsPage() {
       }}>
         <h2 style={{ 'font-size': '18px', margin: 0 }}>Subscribe (weekly)</h2>
         <p style={{ color: '#5b5b5b', margin: 0 }}>
-          Recommended for Try-out or Trial.
+          Recommended for first time try-outs.
         </p>
+
+        {/* Prefer Stripe Buy Button if present; otherwise fall back to Payment Link */}
+        <Show
+          when={hasBuyButtons && BUY_BTN_SUBSCRIBE_ID}
+          fallback={
+            <Show when={PAYMENT_LINK_SUBSCRIBE}>
+              <a
+                href={PAYMENT_LINK_SUBSCRIBE!}
+                style={buttonStyle()}
+                rel="noopener noreferrer"
+              >
+                SUBSCRIBE
+              </a>
+            </Show>
+          }
+        >
+          <stripe-buy-button
+            buy-button-id={BUY_BTN_SUBSCRIBE_ID!}
+            publishable-key={STRIPE_PUBLISHABLE_KEY!}
+          />
+        </Show>
+      </section>
+
+
+
+
+
+
+      
+
       
       {/* SUBSCRIBE CARD */}
       <section style={{
