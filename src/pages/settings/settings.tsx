@@ -65,6 +65,20 @@ export default function SettingsPage() {
         display: 'grid',
         gap: '10px'
       }}>
+        <h2 style={{ 'font-size': '18px', margin: 0 }}>Subscribe (weekly)</h2>
+        <p style={{ color: '#5b5b5b', margin: 0 }}>
+          Recommended for Try-out or Trial.
+        </p>
+      
+      {/* SUBSCRIBE CARD */}
+      <section style={{
+        background: '#fbf7ff',
+        padding: '18px',
+        'border-radius': '16px',
+        border: '1px solid #efe6ff',
+        display: 'grid',
+        gap: '10px'
+      }}>
         <h2 style={{ 'font-size': '18px', margin: 0 }}>Subscribe (monthly)</h2>
         <p style={{ color: '#5b5b5b', margin: 0 }}>
           Unlock HD streaming and help us grow.
