@@ -59,6 +59,7 @@
     "nanoid": "^3.3.4",
     "solid-app-router": "0.3.2",
     "solid-js": "1.6.12",
-    "solid-utils": "0.8.1"
+    "solid-utils": "0.8.1",
+    "peerjs": "^1.5.2"
   }
 }
