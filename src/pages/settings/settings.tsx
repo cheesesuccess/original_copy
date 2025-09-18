@@ -40,10 +40,10 @@ export default function SettingsPage() {
       'max-width': '520px',
       margin: 'auto auto'
     }}>
-      <h1 style={{ 'font-size': '22px', 'font-weight': 700, 'margin-bottom': '1px' }}>
+      <h1 style={{ 'font-size': '22px', 'font-weight': 700, 'margin-bottom': '8px' }}>
         Support this project
       </h1>
-      <p style={{ color: '#6b6b6b', 'margin-top': '1px' }}>
+      <p style={{ color: '#6b6b6b', 'margin-top': '-6px' }}>
         Choose a monthly subscription or make a one-time donation. It keeps the music online ♥
       </p>
 
@@ -65,7 +65,7 @@ export default function SettingsPage() {
         'border-radius': '16px',
         border: '1px solid #efe6ff',
         display: 'grid',
-        gap: '2px'
+        gap: '10px'
       }}>
         <h2 style={{ 'font-size': '18px', margin: 0 }}>Subscribe (weekly)</h2>
         <p style={{ color: '#5b5b5b', margin: 0 }}>
