@@ -1,5 +1,5 @@
 import { Show, createSignal, onMount } from 'solid-js';
-import { Scaffold } from '~/components/scaffold/scaffold'; // ✅ Added for back button support
+import { Scaffold } from '~/components/scaffold/scaffold'; //  Added for back button support
 
 // ---------- ENV VARS ----------
 // Use EITHER Buy Button IDs OR Payment Links.
@@ -31,7 +31,7 @@ export default function SettingsPage() {
     Boolean(PAYMENT_LINK_SUBSCRIBE || PAYMENT_LINK_DONATE);
 
   return (
-    <Scaffold title="Settings">  {/* ✅ Back button appears automatically */}
+    <Scaffold title="Settings">  {/*  Back button appears automatically */}
       <div style={{
         padding: '20px',
         display: 'grid',
