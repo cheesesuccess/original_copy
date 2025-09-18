@@ -178,6 +178,7 @@ export default function SettingsPage() {
         </div>
       </Show>
     </div>
+  </Scaffold>
   );
 }
 
