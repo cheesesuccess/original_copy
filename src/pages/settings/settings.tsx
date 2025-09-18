@@ -38,7 +38,7 @@ export default function SettingsPage() {
       gap: '16px',
       'grid-template-columns': '1fr',
       'max-width': '520px',
-      margin: '4px auto'
+      margin: 'auto auto'
     }}>
       <h1 style={{ 'font-size': '22px', 'font-weight': 700, 'margin-bottom': '1px' }}>
         Support this project
