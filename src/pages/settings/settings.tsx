@@ -38,7 +38,7 @@ export default function SettingsPage() {
       gap: '16px',
       'grid-template-columns': '1fr',
       'max-width': '520px',
-      margin: '4px 0'
+      margin: '4px auto'
     }}>
       <h1 style={{ 'font-size': '22px', 'font-weight': 700, 'margin-bottom': '8px' }}>
         Support this project
@@ -65,7 +65,7 @@ export default function SettingsPage() {
         'border-radius': '16px',
         border: '1px solid #efe6ff',
         display: 'grid',
-        gap: '10px'
+        gap: '2px'
       }}>
         <h2 style={{ 'font-size': '18px', margin: 0 }}>Subscribe (weekly)</h2>
         <p style={{ color: '#5b5b5b', margin: 0 }}>
