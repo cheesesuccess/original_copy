@@ -40,10 +40,10 @@ export default function SettingsPage() {
       'max-width': '520px',
       margin: '4px auto'
     }}>
-      <h1 style={{ 'font-size': '22px', 'font-weight': 700, 'margin-bottom': '0px' }}>
+      <h1 style={{ 'font-size': '22px', 'font-weight': 700, 'margin-bottom': '1px' }}>
         Support this project
       </h1>
-      <p style={{ color: '#6b6b6b', 'margin-top': '0px' }}>
+      <p style={{ color: '#6b6b6b', 'margin-top': '1px' }}>
         Choose a monthly subscription or make a one-time donation. It keeps the music online ♥
       </p>
 
