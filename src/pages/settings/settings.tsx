@@ -33,12 +33,9 @@ export default function SettingsPage() {
   return (
     <Scaffold title="Settings">  {/* Back button appears automatically */}
       <div style={{
-        padding: '20px',
         display: 'grid',
         gap: '16px',
-        'grid-template-columns': '1fr',
-        'max-width': '520px',
-        margin: '0 auto'
+        'grid-template-columns': '1fr'
       }}>
         <h1 style={{ 'font-size': '22px', 'font-weight': 700, 'margin-bottom': '8px' }}>
           Support this project
