@@ -4,9 +4,9 @@ import { IconButton } from '~/components/icon-button/icon-button'
 import { Artwork } from '~/components/shared-player-components/artwork/artwork'
 import { Controls } from '~/components/shared-player-components/controls/main-controls'
 import { VolumePanel } from '~/components/shared-player-components/volume/volume-panel'
-import { LyricsPanel } from '~/components/lyrics-panel/lyrics-panel'
 import { VolumeButton } from '~/components/shared-player-components/volume/volume-button'
 import { Info } from '~/components/shared-player-components/info/info'
+import { FavoriteButton } from '~/components/shared-player-components/info/favorite-button'
 import { Timeline } from '~/components/shared-player-components/timeline/timeline'
 import { clx, useResizeObserver } from '~/utils'
 import { useMenu } from '~/components/menu/menu'
@@ -61,6 +61,7 @@ export const ControlsPane = (props: FullPlayerProps): JSXElement => {
         <div class={styles.controls}>
           <div class={styles.info}>
             <Info bigTitle />
+            <FavoriteButton />
           </div>
           <Timeline />
           <Controls />
@@ -74,9 +75,6 @@ export const ControlsPane = (props: FullPlayerProps): JSXElement => {
               />
             )}
           </div>
-        </div>
-        <div class={styles.lyrics}>
-          <LyricsPanel />
         </div>
       </div>
     </div>
