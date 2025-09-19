@@ -8,3 +8,4 @@ const route: RouteDefinition = {
 }
 
 export default route
+
