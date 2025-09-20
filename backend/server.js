@@ -6,8 +6,8 @@ const app = express();
 app.use(bodyParser.json());
 
 // DPO Credentials
-const DPO_MERCHANT_ID = "YOUR_MERCHANT_ID";
-const DPO_COMPANY_TOKEN = "YOUR_COMPANY_TOKEN"; // Provided by DPO
+const DPO_MERCHANT_ID = "5525";
+const DPO_COMPANY_TOKEN = "8D3DA73D-9D7F-4E09-96D4-3D44E7A83EA3"; // Provided by DPO
 
 // Verify payment route
 app.post("/verify-payment", async (req, res) => {
