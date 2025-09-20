@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show } from 'solid-js'
+import { createSignal, Show } from 'solid-js'
 import * as s from './auth.css'
 import { auth } from '~/firebase/firebase'
 import {
@@ -16,18 +16,9 @@ const AuthPage = () => {
   const [password, setPassword] = createSignal('')
   const [loading, setLoading] = createSignal(false)
   const [message, setMessage] = createSignal<string | null>(null)
-  const [authChecked, setAuthChecked] = createSignal(false) // Track if auth state is checked
 
-  onMount(() => {
-    // Check auth state on component mount
-    onAuthStateChanged(auth, (u) => {
-      if (u) {
-        navigate('/library/albums', { replace: true })
-      } else {
-        // Not authenticated, show login page
-        setAuthChecked(true)
-      }
-    })
+  onAuthStateChanged(auth, (u) => {
+    if (u) navigate('/library/albums', { replace: true })
   })
 
   const onSubmit = async (e: Event) => {
@@ -55,15 +46,6 @@ const AuthPage = () => {
     } catch (err: any) {
       setMessage(err?.message ?? 'Failed to send reset email')
     }
-  }
-
-  // Render a loading indicator until auth state is checked
-  if (!authChecked()) {
-    return (
-      <div class={s.page}>
-        <div>Loading...</div>
-      </div>
-    )
   }
 
   return (
