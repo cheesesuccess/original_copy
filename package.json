@@ -63,7 +63,6 @@
   "peerjs": "^1.5.2",
   "express": "^4.21.0",
   "body-parser": "^1.20.3",
-  "axios": "^1.7.3",
-  "dpo-pay-node-sdk": "^3.0.0"
+  "axios": "^1.7.3"
   }
 }
