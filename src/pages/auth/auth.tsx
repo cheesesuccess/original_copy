@@ -1,4 +1,4 @@
-import { createSignal, Show } from 'solid-js'
+import { createSignal, onMount, Show } from 'solid-js'
 import * as s from './auth.css'
 import { auth } from '~/firebase/firebase'
 import {
@@ -16,17 +16,18 @@ const AuthPage = () => {
   const [password, setPassword] = createSignal('')
   const [loading, setLoading] = createSignal(false)
   const [message, setMessage] = createSignal<string | null>(null)
-  const [authChecked, setAuthChecked] = createSignal(false) // Track auth check
+  const [authChecked, setAuthChecked] = createSignal(false) // Track if auth state is checked
 
-  // Check auth state on component mount
-  onAuthStateChanged(auth, (u) => {
-    if (u) {
-      // User is logged in, redirect
-      navigate('/library/albums', { replace: true })
-    } else {
-      // Not logged in, show login page
-      setAuthChecked(true)
-    }
+  onMount(() => {
+    // Check auth state on component mount
+    onAuthStateChanged(auth, (u) => {
+      if (u) {
+        navigate('/library/albums', { replace: true })
+      } else {
+        // Not authenticated, show login page
+        setAuthChecked(true)
+      }
+    })
   })
 
   const onSubmit = async (e: Event) => {
@@ -38,7 +39,7 @@ const AuthPage = () => {
       } else {
         await createUserWithEmailAndPassword(auth, email(), password())
       }
-      // Navigation happens in onAuthStateChanged
+      // navigate happens in onAuthStateChanged
     } catch (err: any) {
       setMessage(err?.message ?? 'Something went wrong')
     } finally {
@@ -56,57 +57,63 @@ const AuthPage = () => {
     }
   }
 
-  return (
-    // Show nothing or a loader until auth state is checked
-    <Show when={authChecked()}>
+  // Render a loading indicator until auth state is checked
+  if (!authChecked()) {
+    return (
       <div class={s.page}>
-        <form class={s.card} onSubmit={onSubmit}>
-          <div class={s.brandRow}>
-            <div style={{'font-size': '28px'}}>🍎</div>
-            <div class={s.brand}>Music</div>
-          </div>
-          <div class={s.subtitle}>An all‑access experience</div>
-
-          <input
-            class={s.input}
-            type='email'
-            placeholder='Email'
-            value={email()}
-            onInput={(e) => setEmail(e.currentTarget.value)}
-            required
-          />
-          <input
-            class={s.input}
-            type='password'
-            placeholder='Password'
-            value={password()}
-            onInput={(e) => setPassword(e.currentTarget.value)}
-            required
-          />
-
-          <div class={s.linkRow}>
-            <span />
-            <button type='button' class={s.ghostLink} onClick={onForgot}>
-              Forgot password
-            </button>
-          </div>
-
-          <button class={s.button} type='submit' disabled={loading()}>
-            {mode() === 'login' ? 'LOGIN' : 'SIGN UP'}
-          </button>
-
-          <Show when={message()}>
-            <div style={{'margin-top':'8px','font-size':'12px','color':'#444'}}>{message()}</div>
-          </Show>
-
-          <div class={s.switchRow}>
-            <Show when={mode()==='login'} fallback={<span>Already have an account? <button type='button' class={s.ghostLink} onClick={() => setMode('login')}>Sign In</button></span>}>
-              <span>Don't have an account? <button type='button' class={s.ghostLink} onClick={() => setMode('signup')}>Sign Up</button></span>
-            </Show>
-          </div>
-        </form>
+        <div>Loading...</div>
       </div>
-    </Show>
+    )
+  }
+
+  return (
+    <div class={s.page}>
+      <form class={s.card} onSubmit={onSubmit}>
+        <div class={s.brandRow}>
+          <div style={{'font-size': '28px'}}>🍎</div>
+          <div class={s.brand}>Music</div>
+        </div>
+        <div class={s.subtitle}>An all‑access experience</div>
+
+        <input
+          class={s.input}
+          type='email'
+          placeholder='Email'
+          value={email()}
+          onInput={(e) => setEmail(e.currentTarget.value)}
+          required
+        />
+        <input
+          class={s.input}
+          type='password'
+          placeholder='Password'
+          value={password()}
+          onInput={(e) => setPassword(e.currentTarget.value)}
+          required
+        />
+
+        <div class={s.linkRow}>
+          <span />
+          <button type='button' class={s.ghostLink} onClick={onForgot}>
+            Forgot password
+          </button>
+        </div>
+
+        <button class={s.button} type='submit' disabled={loading()}>
+          {mode() === 'login' ? 'LOGIN' : 'SIGN UP'}
+        </button>
+
+        <Show when={message()}>
+          <div style={{'margin-top':'8px','font-size':'12px','color':'#444'}}>{message()}</div>
+        </Show>
+
+        <div class={s.switchRow}>
+          <Show when={mode()==='login'} fallback={<span>Already have an account? <button type='button' class={s.ghostLink} onClick={() => setMode('login')}>Sign In</button></span>}>
+            <span>Don't have an account? <button type='button' class={s.ghostLink} onClick={() => setMode('signup')}>Sign Up</button></span>
+          </Show>
+        </div>
+      </form>
+    </div>
   )
 }
 export default AuthPage
