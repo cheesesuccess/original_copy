@@ -18,7 +18,7 @@ const AuthPage = () => {
   const [message, setMessage] = createSignal<string | null>(null)
 
   onAuthStateChanged(auth, (u) => {
-    if (u) navigate('/library/tracks', { replace: true })
+    if (u) navigate('/library/albums', { replace: true })
   })
 
   const onSubmit = async (e: Event) => {
