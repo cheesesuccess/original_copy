@@ -1,5 +1,4 @@
-import { createSignal, Show, onMount } from 'solid-js'
-import { useNavigate } from 'solid-app-router'
+import { createSignal, Show } from 'solid-js'
 import * as s from './auth.css'
 import { auth } from '~/firebase/firebase'
 import {
@@ -8,133 +7,95 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
 } from 'firebase/auth'
+import { useNavigate } from 'solid-app-router'
 
 const AuthPage = () => {
   const navigate = useNavigate()
-  const [mode, setMode] = createSignal<'login' | 'signup' | 'forgot'>('login')
+  const [mode, setMode] = createSignal<'login'|'signup'>('login')
   const [email, setEmail] = createSignal('')
   const [password, setPassword] = createSignal('')
   const [loading, setLoading] = createSignal(false)
   const [message, setMessage] = createSignal<string | null>(null)
 
-  //  Global fetch override to prevent caching
-  onMount(() => {
-    if ('fetch' in window) {
-      const originalFetch = window.fetch
-      window.fetch = (resource, config: any = {}) => {
-        config.cache = 'no-store'
-        config.headers = {
-          ...config.headers,
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-        }
-        return originalFetch(resource, config)
-      }
-    }
-
-    // Redirect if already logged in
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigate('/library/tracks', { replace: true })
-        location.reload() //  force reload to avoid stale cached app
-      }
-    })
+  onAuthStateChanged(auth, (u) => {
+    if (u) navigate('/library/albums', { replace: true })
   })
 
-  // Handle form submission
   const onSubmit = async (e: Event) => {
     e.preventDefault()
-    setLoading(true)
-    setMessage(null)
-
+    setLoading(true); setMessage(null)
     try {
       if (mode() === 'login') {
         await signInWithEmailAndPassword(auth, email(), password())
-      } else if (mode() === 'signup') {
+      } else {
         await createUserWithEmailAndPassword(auth, email(), password())
-      } else if (mode() === 'forgot') {
-        if (!email()) return setMessage('Enter your email first')
-        await sendPasswordResetEmail(auth, email())
-        setMessage('Password reset email sent!')
-        return
       }
+      // navigate happens in onAuthStateChanged
     } catch (err: any) {
-      setMessage(err?.message || 'Something went wrong.')
+      setMessage(err?.message ?? 'Something went wrong')
     } finally {
       setLoading(false)
     }
   }
 
-  // UI
+  const onForgot = async () => {
+    if (!email()) { setMessage('Enter your email first'); return }
+    try {
+      await sendPasswordResetEmail(auth, email())
+      setMessage('Password reset email sent.')
+    } catch (err: any) {
+      setMessage(err?.message ?? 'Failed to send reset email')
+    }
+  }
+
   return (
     <div class={s.page}>
       <form class={s.card} onSubmit={onSubmit}>
-        {/* Brand Section */}
         <div class={s.brandRow}>
-          <div style={{ 'font-size': '28px' }}>🎵</div>
-          <div class={s.brand}>Music Access</div>
+          <div style={{'font-size': '28px'}}>🍎</div>
+          <div class={s.brand}>Music</div>
         </div>
-        <div class={s.subtitle}>
-          {mode() === 'login' && 'Sign in to continue'}
-          {mode() === 'signup' && 'Create a new account'}
-          {mode() === 'forgot' && 'Reset your password'}
-        </div>
+        <div class={s.subtitle}>An all‑access experience</div>
 
-        {/* Email Input */}
         <input
           class={s.input}
-          type="email"
-          placeholder="Email"
+          type='email'
+          placeholder='Email'
           value={email()}
           onInput={(e) => setEmail(e.currentTarget.value)}
           required
         />
+        <input
+          class={s.input}
+          type='password'
+          placeholder='Password'
+          value={password()}
+          onInput={(e) => setPassword(e.currentTarget.value)}
+          required
+        />
 
-        {/* Password only for Login/Signup */}
-        <Show when={mode() !== 'forgot'}>
-          <input
-            class={s.input}
-            type="password"
-            placeholder="Password"
-            value={password()}
-            onInput={(e) => setPassword(e.currentTarget.value)}
-            required
-          />
-        </Show>
+        <div class={s.linkRow}>
+          <span />
+          <button type='button' class={s.ghostLink} onClick={onForgot}>
+            Forgot password
+          </button>
+        </div>
 
-        {/* Action Button */}
-        <button class={s.button} type="submit" disabled={loading()}>
-          {loading() ? 'Please wait...' : 
-            mode() === 'login' ? 'Login' : 
-            mode() === 'signup' ? 'Sign Up' : 
-            'Send Reset Link'}
+        <button class={s.button} type='submit' disabled={loading()}>
+          {mode() === 'login' ? 'LOGIN' : 'SIGN UP'}
         </button>
 
-        {/* Message Section */}
         <Show when={message()}>
-          <div class={s.messageBox}>{message()}</div>
+          <div style={{'margin-top':'8px','font-size':'12px','color':'#444'}}>{message()}</div>
         </Show>
 
-        {/* Links Section */}
         <div class={s.switchRow}>
-          {mode() === 'login' && (
-            <>
-              <button type="button" class={s.ghostLink} onClick={() => setMode('signup')}>Sign Up</button>
-              <button type="button" class={s.ghostLink} onClick={() => setMode('forgot')}>Forgot Password?</button>
-            </>
-          )}
-
-          {mode() === 'signup' && (
-            <button type="button" class={s.ghostLink} onClick={() => setMode('login')}>Back to Login</button>
-          )}
-
-          {mode() === 'forgot' && (
-            <button type="button" class={s.ghostLink} onClick={() => setMode('login')}>Back to Login</button>
-          )}
+          <Show when={mode()==='login'} fallback={<span>Already have an account? <button type='button' class={s.ghostLink} onClick={() => setMode('login')}>Sign In</button></span>}>
+            <span>Don't have an account? <button type='button' class={s.ghostLink} onClick={() => setMode('signup')}>Sign Up</button></span>
+          </Show>
         </div>
       </form>
     </div>
   )
 }
-
 export default AuthPage
