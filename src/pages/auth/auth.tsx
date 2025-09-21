@@ -1,61 +1,86 @@
-import { createSignal, Show } from 'solid-js'
-import * as s from './auth.css'
-import { auth } from '~/firebase/firebase'
+import { createSignal, Show, onMount } from 'solid-js';
+import * as s from './auth.css';
+import { auth } from '~/firebase/firebase';
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
-} from 'firebase/auth'
-import { useNavigate } from 'solid-app-router'
+} from 'firebase/auth';
+import { useNavigate } from 'solid-app-router';
 
 const AuthPage = () => {
-  const navigate = useNavigate()
-  const [mode, setMode] = createSignal<'login'|'signup'>('login')
-  const [email, setEmail] = createSignal('')
-  const [password, setPassword] = createSignal('')
-  const [loading, setLoading] = createSignal(false)
-  const [message, setMessage] = createSignal<string | null>(null)
+  console.log("[AuthPage] Component loaded");
 
+  const navigate = useNavigate();
+  const [mode, setMode] = createSignal<'login' | 'signup'>('login');
+  const [email, setEmail] = createSignal('');
+  const [password, setPassword] = createSignal('');
+  const [loading, setLoading] = createSignal(false);
+  const [message, setMessage] = createSignal<string | null>(null);
+
+  onMount(() => {
+    console.log("[AuthPage] onMount: Page rendered");
+  });
+
+  // Watch for auth state
   onAuthStateChanged(auth, (u) => {
-    if (u) navigate('/library/albums', { replace: true })
-  })
+    console.log("[AuthPage] onAuthStateChanged fired. User:", u);
+    if (u) {
+      console.log("[AuthPage] User logged in, navigating to /library/albums");
+      navigate('/library/albums', { replace: true });
+    }
+  });
 
   const onSubmit = async (e: Event) => {
-    e.preventDefault()
-    setLoading(true); setMessage(null)
+    e.preventDefault();
+    console.log(`[AuthPage] onSubmit: mode=${mode()}, email=${email()}`);
+    setLoading(true);
+    setMessage(null);
     try {
       if (mode() === 'login') {
-        await signInWithEmailAndPassword(auth, email(), password())
+        console.log("[AuthPage] Attempting login...");
+        await signInWithEmailAndPassword(auth, email(), password());
+        console.log("[AuthPage] Login success, waiting for onAuthStateChanged");
       } else {
-        await createUserWithEmailAndPassword(auth, email(), password())
+        console.log("[AuthPage] Attempting signup...");
+        await createUserWithEmailAndPassword(auth, email(), password());
+        console.log("[AuthPage] Signup success, waiting for onAuthStateChanged");
       }
-      // navigate happens in onAuthStateChanged
     } catch (err: any) {
-      setMessage(err?.message ?? 'Something went wrong')
+      console.error("[AuthPage] Auth error:", err);
+      setMessage(err?.message ?? 'Something went wrong');
     } finally {
-      setLoading(false)
+      setLoading(false);
+      console.log("[AuthPage] onSubmit complete");
     }
-  }
+  };
 
   const onForgot = async () => {
-    if (!email()) { setMessage('Enter your email first'); return }
-    try {
-      await sendPasswordResetEmail(auth, email())
-      setMessage('Password reset email sent.')
-    } catch (err: any) {
-      setMessage(err?.message ?? 'Failed to send reset email')
+    console.log("[AuthPage] Forgot password clicked");
+    if (!email()) {
+      setMessage('Enter your email first');
+      return;
     }
-  }
+    try {
+      console.log("[AuthPage] Sending password reset email...");
+      await sendPasswordResetEmail(auth, email());
+      console.log("[AuthPage] Password reset email sent.");
+      setMessage('Password reset email sent.');
+    } catch (err: any) {
+      console.error("[AuthPage] Reset email error:", err);
+      setMessage(err?.message ?? 'Failed to send reset email');
+    }
+  };
 
   return (
     <div class={s.page}>
       <form class={s.card} onSubmit={onSubmit}>
         <div class={s.brandRow}>
-          <div style={{'font-size': '28px'}}>🍎</div>
+          <div style={{ 'font-size': '28px' }}>🍎</div>
           <div class={s.brand}>Music</div>
         </div>
-        <div class={s.subtitle}>An all‑access experience</div>
+        <div class={s.subtitle}>An all-access experience</div>
 
         <input
           class={s.input}
@@ -86,16 +111,19 @@ const AuthPage = () => {
         </button>
 
         <Show when={message()}>
-          <div style={{'margin-top':'8px','font-size':'12px','color':'#444'}}>{message()}</div>
+          <div style={{ 'margin-top': '8px', 'font-size': '12px', 'color': '#444' }}>{message()}</div>
         </Show>
 
         <div class={s.switchRow}>
-          <Show when={mode()==='login'} fallback={<span>Already have an account? <button type='button' class={s.ghostLink} onClick={() => setMode('login')}>Sign In</button></span>}>
+          <Show
+            when={mode() === 'login'}
+            fallback={<span>Already have an account? <button type='button' class={s.ghostLink} onClick={() => setMode('login')}>Sign In</button></span>}>
             <span>Don't have an account? <button type='button' class={s.ghostLink} onClick={() => setMode('signup')}>Sign Up</button></span>
           </Show>
         </div>
       </form>
     </div>
-  )
-}
-export default AuthPage
+  );
+};
+
+export default AuthPage;
