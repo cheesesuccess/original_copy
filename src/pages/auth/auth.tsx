@@ -17,10 +17,27 @@ const AuthPage = () => {
   const [loading, setLoading] = createSignal(false)
   const [message, setMessage] = createSignal<string | null>(null)
 
-  // Redirect if already logged in
+  //  Global fetch override to prevent caching
   onMount(() => {
+    if ('fetch' in window) {
+      const originalFetch = window.fetch
+      window.fetch = (resource, config: any = {}) => {
+        config.cache = 'no-store'
+        config.headers = {
+          ...config.headers,
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        }
+        return originalFetch(resource, config)
+      }
+    }
+
+    // Redirect if already logged in
     onAuthStateChanged(auth, (user) => {
-      if (user) navigate('/library/tracks', { replace: true })
+      if (user) {
+        navigate('/library/tracks', { replace: true })
+        location.reload() //  force reload to avoid stale cached app
+      }
     })
   })
 
