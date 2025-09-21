@@ -5,7 +5,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# Required for the official Pages deploy action
 permissions:
   contents: read
   pages: write
@@ -32,7 +31,6 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        # Use npm install (not npm ci) to avoid lockfile mismatch errors
         run: npm install
 
       - name: Configure Pages
@@ -54,8 +52,16 @@ jobs:
           DPO_COMPANY_TOKEN=${{ secrets.DPO_COMPANY_TOKEN }}
           EOF
 
-      - name: Build
+      # Clear any old artifacts to avoid stale files
+      - name: Remove old dist
+        run: rm -rf dist
+
+      - name: Build fresh with cache-busting
         run: npm run build
+
+      - name: Add cache-busting meta tags to index.html
+        run: |
+          sed -i 's|</head>|<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" /><meta http-equiv="Pragma" content="no-cache" /><meta http-equiv="Expires" content="0" /></head>|' dist/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
