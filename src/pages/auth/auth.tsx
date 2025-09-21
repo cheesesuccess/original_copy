@@ -1,77 +1,80 @@
-import { createSignal, Show, onMount } from 'solid-js';
-import * as s from './auth.css';
-import { auth } from '~/firebase/firebase';
+import { createSignal, Show, onMount } from 'solid-js'
+import * as s from './auth.css'
+import { auth } from '~/firebase/firebase'
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
-} from 'firebase/auth';
-import { useNavigate } from 'solid-app-router';
+} from 'firebase/auth'
+import { useNavigate } from 'solid-app-router'
 
 const AuthPage = () => {
-  console.log("[AuthPage] Component loaded");
+  const navigate = useNavigate()
+  const [mode, setMode] = createSignal<'login' | 'signup'>('login')
+  const [email, setEmail] = createSignal('')
+  const [password, setPassword] = createSignal('')
+  const [loading, setLoading] = createSignal(false)
+  const [message, setMessage] = createSignal<string | null>(null)
+  const [logs, setLogs] = createSignal<string[]>([])  // <- For page logs
 
-  const navigate = useNavigate();
-  const [mode, setMode] = createSignal<'login' | 'signup'>('login');
-  const [email, setEmail] = createSignal('');
-  const [password, setPassword] = createSignal('');
-  const [loading, setLoading] = createSignal(false);
-  const [message, setMessage] = createSignal<string | null>(null);
+  // Helper to add logs to the page
+  const addLog = (msg: string) => setLogs(l => [...l, `[${new Date().toLocaleTimeString()}] ${msg}`])
 
   onMount(() => {
-    console.log("[AuthPage] onMount: Page rendered");
-  });
+    addLog("Page mounted: AuthPage rendering started.")
+  })
 
-  // Watch for auth state
   onAuthStateChanged(auth, (u) => {
-    console.log("[AuthPage] onAuthStateChanged fired. User:", u);
+    addLog("onAuthStateChanged fired.")
     if (u) {
-      console.log("[AuthPage] User logged in, navigating to /library/albums");
-      navigate('/library/albums', { replace: true });
+      addLog("User authenticated. Redirecting to /library/albums")
+      navigate('/library/albums', { replace: true })
+    } else {
+      addLog("No user logged in.")
     }
-  });
+  })
 
   const onSubmit = async (e: Event) => {
-    e.preventDefault();
-    console.log(`[AuthPage] onSubmit: mode=${mode()}, email=${email()}`);
-    setLoading(true);
-    setMessage(null);
+    e.preventDefault()
+    addLog(`Submit clicked. Mode: ${mode()}. Email: ${email()}`)
+    setLoading(true)
+    setMessage(null)
     try {
       if (mode() === 'login') {
-        console.log("[AuthPage] Attempting login...");
-        await signInWithEmailAndPassword(auth, email(), password());
-        console.log("[AuthPage] Login success, waiting for onAuthStateChanged");
+        addLog("Attempting login...")
+        await signInWithEmailAndPassword(auth, email(), password())
+        addLog("Login successful, waiting for redirect...")
       } else {
-        console.log("[AuthPage] Attempting signup...");
-        await createUserWithEmailAndPassword(auth, email(), password());
-        console.log("[AuthPage] Signup success, waiting for onAuthStateChanged");
+        addLog("Attempting signup...")
+        await createUserWithEmailAndPassword(auth, email(), password())
+        addLog("Signup successful, waiting for redirect...")
       }
     } catch (err: any) {
-      console.error("[AuthPage] Auth error:", err);
-      setMessage(err?.message ?? 'Something went wrong');
+      addLog(`Auth error: ${err?.message}`)
+      setMessage(err?.message ?? 'Something went wrong')
     } finally {
-      setLoading(false);
-      console.log("[AuthPage] onSubmit complete");
+      setLoading(false)
+      addLog("Submit handler finished.")
     }
-  };
+  }
 
   const onForgot = async () => {
-    console.log("[AuthPage] Forgot password clicked");
-    if (!email()) {
-      setMessage('Enter your email first');
-      return;
+    addLog("Forgot password clicked.")
+    if (!email()) { 
+      setMessage('Enter your email first')
+      addLog("Forgot password failed: No email provided.")
+      return 
     }
     try {
-      console.log("[AuthPage] Sending password reset email...");
-      await sendPasswordResetEmail(auth, email());
-      console.log("[AuthPage] Password reset email sent.");
-      setMessage('Password reset email sent.');
+      await sendPasswordResetEmail(auth, email())
+      setMessage('Password reset email sent.')
+      addLog("Password reset email sent.")
     } catch (err: any) {
-      console.error("[AuthPage] Reset email error:", err);
-      setMessage(err?.message ?? 'Failed to send reset email');
+      addLog(`Password reset error: ${err?.message}`)
+      setMessage(err?.message ?? 'Failed to send reset email')
     }
-  };
+  }
 
   return (
     <div class={s.page}>
@@ -122,8 +125,16 @@ const AuthPage = () => {
           </Show>
         </div>
       </form>
-    </div>
-  );
-};
 
-export default AuthPage;
+      {/* LOG PANEL */}
+      <div style={{ marginTop: '20px', padding: '10px', background: '#f4f4f4', borderRadius: '6px', maxHeight: '150px', overflowY: 'auto', fontSize: '12px', color: '#333' }}>
+        <strong>Debug Logs:</strong>
+        {logs().map(log => (
+          <div>{log}</div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default AuthPage
