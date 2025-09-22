@@ -1,11 +1,12 @@
-<!doctype html>
+<!doctype html >
 <html lang='en-US'>
   <head>
+    
     <title>Osho Digital Library</title>
     <meta charset='UTF-8'>
     <base href='./'>
-    <!-- Stripe Buy Button (needed only if you use Buy Buttons) -->
-    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+<!-- Stripe Buy Button (needed only if you use Buy Buttons) -->
+<script async src="https://js.stripe.com/v3/buy-button.js"></script>
     <!--
       TODO. For now only Chrome supports 'unsafe-hashes' option.
       When other browsers support it, it is safer to use it than 'unsafe-hashes'.
@@ -24,59 +25,13 @@
       form-action 'none';
       base-uri 'none';
     ">
+
     <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>
-    <meta name='theme-color' content='transparent'>
+    <meta name='theme-color' content='#2a2827'>
     <meta name='description' content='A comprehensive digital library of Osho teachings and discourses.'>
     <link rel='icon' href='/icons/icon_responsive.svg' type='image/svg+xml' />
     <link rel="alternate icon" href="/icons/icon_16.png" sizes="16x16" type="image/png" />
     <link rel='apple-touch-icon' href='/icons/apple-touch-icon.png' sizes='180x180' />
-
-    <!-- Hidden image for color extraction -->
-    <img id="coverImage" src="/images/albums/tao-upanishad-by-osho-01-127.webp" crossOrigin="anonymous" style="display:none;">
-
-    <!-- Include Color Thief library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.min.js"></script>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const img = document.getElementById('coverImage');
-        const colorThief = new ColorThief();
-
-        function updateThemeColor() {
-          if (img.complete) {
-            try {
-              const dominantColor = colorThief.getColor(img);
-              const hexColor = rgbToHex(dominantColor[0], dominantColor[1], dominantColor[2]);
-              const themeMeta = document.querySelector('meta[name="theme-color"]');
-              if (themeMeta) {
-                themeMeta.setAttribute('content', hexColor);
-              }
-            } catch (error) {
-              console.error("Error extracting color:", error);
-            }
-          } else {
-            // If image not loaded yet, try again when loaded
-            img.onload = () => {
-              updateThemeColor();
-            };
-          }
-        }
-
-        // Convert RGB to HEX
-        function rgbToHex(r, g, b) {
-          return "#" + [r, g, b].map(x => {
-            const hex = x.toString(16);
-            return hex.length === 1 ? "0" + hex : hex;
-          }).join('');
-        }
-
-        // Trigger color extraction
-        updateThemeColor();
-
-        // Optional: re-update if the image source changes dynamically
-        // You can set up a MutationObserver or call updateThemeColor() when needed
-      });
-    </script>
   </head>
   <body>
     <noscript>
