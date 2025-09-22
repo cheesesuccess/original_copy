@@ -80,3 +80,27 @@ export const getAppThemeFromImage = async (imageUrl: string, isDark: boolean) =>
     return {};
   }
 };
+
+// ---- Legacy wrapper for backward compatibility ----
+export const getAppTheme = async (argbOrImage: string | number, isDark: boolean) => {
+  if (typeof argbOrImage === 'string') {
+    return getAppThemeFromImage(argbOrImage, isDark);
+  }
+  // If it's a number, generate theme directly from ARGB
+  const palette = CorePalette.of(argbOrImage);
+  type PaletteKey = 'a1' | 'a2' | 'a3' | 'error' | 'n1' | 'n2';
+  const getTone = (key: PaletteKey, tones: [light: number, dark: number]) => {
+    const tone = isDark ? tones[1] : tones[0];
+    return palette[key].tone(tone);
+  };
+  const getHexTone = (key: PaletteKey, tones: [light: number, dark: number]) =>
+    hexFromArgb(getTone(key, tones));
+  const primaryArgb = getTone('a1', [40, 80]);
+
+  return {
+    primary: hexFromArgb(primaryArgb),
+    onPrimary: getHexTone('a1', [100, 20]),
+    surface: getHexTone('n1', [99, 10]),
+    secondaryContainer: getHexTone('a2', [90, 30]),
+  };
+};
