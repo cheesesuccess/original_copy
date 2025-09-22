@@ -43,7 +43,7 @@ const TopBar = (props: TopBar) => {
         },
         {
           name: 'Coplay',
-          action: () => navigate('/room'),
+          action: () => navigate('/auth'),
         },
       ],
       e.target as HTMLElement,
