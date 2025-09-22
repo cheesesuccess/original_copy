@@ -1,59 +1,59 @@
-import { setElementVars } from '@vanilla-extract/dynamic';
-import { createEffect } from 'solid-js';
-import { useLocation } from 'solid-app-router';
-import { toast } from '~/components/toast/toast';
-import { usePeer } from '~/peer/create-peer';
-import { colorsTheme } from '~/styles/vars.css';
-import { useAudioPlayer } from '../../audio/create-audio-player';
-import { installGlobalRipple } from '../../helpers/ripple/install-global-ripple';
-import { usePlayerStore } from '../../stores/stores';
-import { registerServiceWorker } from '../../sw/register-sw';
-import { useDarkThemeEnabled } from '../../utils';
-import { getAppThemeFromImage } from '~/helpers/app-theme';
-import * as styles from './app.css';
+import { setElementVars } from '@vanilla-extract/dynamic'
+import { createEffect } from 'solid-js'
+import { useLocation } from 'solid-app-router'
+import { toast } from '~/components/toast/toast'
+import { usePeer } from '~/peer/create-peer'
+import { colorsTheme } from '~/styles/vars.css'
+import { useAudioPlayer } from '../../audio/create-audio-player'
+import { installGlobalRipple } from '../../helpers/ripple/install-global-ripple'
+import { usePlayerStore } from '../../stores/stores'
+import { registerServiceWorker } from '../../sw/register-sw'
+import { useDarkThemeEnabled } from '../../utils'
+import * as styles from './app.css'
 
 export const useSetupApp = (): void => {
-  useAudioPlayer();
-  usePeer();
+  useAudioPlayer()
+  usePeer()
 
-  const [playerState] = usePlayerStore();
-  const location = useLocation();
-  const isDarkTheme = useDarkThemeEnabled();
+  const [playerState] = usePlayerStore()
+  const location = useLocation()
+
+  const isDarkTheme = useDarkThemeEnabled()
 
   const titlebarElement = document.querySelector(
-    'meta[name="theme-color"]'
-  ) as HTMLMetaElement;
+    'meta[name="theme-color"]',
+  ) as HTMLMetaElement
 
-  // Reactively update theme when song or dark mode changes
   createEffect(() => {
-    const isDark = isDarkTheme();
-    const songImage = playerState.activeTrack?.imageUrl;
+    const isDark = isDarkTheme()
+    const argb = playerState.activeTrack?.primaryColor
 
-    // No image, reset theme colors
-    if (!songImage) {
-      const emptyTheme: Record<string, string> = {};
-      Object.keys(colorsTheme).forEach((key) => (emptyTheme[key] = ''));
-      setElementVars(document.documentElement, colorsTheme, emptyTheme);
-      return;
+    const doc = document.documentElement
+
+    if (argb === undefined) {
+      type EmptyTheme = {
+        [key in keyof typeof colorsTheme]: string
+      }
+
+      const emptyTheme = Object.fromEntries(
+        Object.entries(colorsTheme).map(([key]) => [key, '']),
+      ) as EmptyTheme
+
+      setElementVars(doc, colorsTheme, emptyTheme)
+      return
     }
 
-    // Load colors from image and apply theme
-    getAppThemeFromImage(songImage, isDark).then((scheme) => {
-      if (!scheme || Object.keys(scheme).length === 0) return;
+    const { pathname } = location
 
-      setElementVars(document.documentElement, colorsTheme, scheme);
+    import('~/helpers/app-theme').then((module) => {
+      const scheme = module.getAppTheme(argb, isDark)
+      setElementVars(doc, colorsTheme, scheme)
 
-      if (titlebarElement) {
-        const { pathname } = location;
-        titlebarElement.content =
-          pathname === '/player'
-            ? scheme.secondaryContainer
-            : scheme.surface;
-      }
-    });
-  });
+      titlebarElement.content =
+        pathname === '/player' ? scheme.secondaryContainer : scheme.surface
+    })
+  })
 
-  // Register service worker for updates
   registerServiceWorker({
     onNeedRefresh(updateSW) {
       toast({
@@ -62,13 +62,14 @@ export const useSetupApp = (): void => {
         controls: [
           {
             title: 'Reload',
-            action: () => updateSW(),
+            action: () => {
+              updateSW()
+            },
           },
         ],
-      });
+      })
     },
-  });
+  })
 
-  // Enable ripple effect for buttons
-  installGlobalRipple(styles.interactable);
-};
+  installGlobalRipple(styles.interactable)
+}
