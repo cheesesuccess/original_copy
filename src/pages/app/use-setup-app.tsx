@@ -9,6 +9,7 @@ import { installGlobalRipple } from '../../helpers/ripple/install-global-ripple'
 import { usePlayerStore } from '../../stores/stores';
 import { registerServiceWorker } from '../../sw/register-sw';
 import { useDarkThemeEnabled } from '../../utils';
+import { getAppThemeFromImage } from '~/helpers/app-theme';
 import * as styles from './app.css';
 
 export const useSetupApp = (): void => {
@@ -23,36 +24,36 @@ export const useSetupApp = (): void => {
     'meta[name="theme-color"]'
   ) as HTMLMetaElement;
 
+  // Reactively update theme when song or dark mode changes
   createEffect(() => {
     const isDark = isDarkTheme();
-    const argb = playerState.activeTrack?.primaryColor;
-    const doc = document.documentElement;
+    const songImage = playerState.activeTrack?.imageUrl;
 
-    if (!argb) {
-      // Reset theme if no primary color found
+    // No image, reset theme colors
+    if (!songImage) {
       const emptyTheme: Record<string, string> = {};
-      Object.keys(colorsTheme).forEach((key) => {
-        emptyTheme[key] = '';
-      });
-
-      setElementVars(doc, colorsTheme, emptyTheme);
+      Object.keys(colorsTheme).forEach((key) => (emptyTheme[key] = ''));
+      setElementVars(document.documentElement, colorsTheme, emptyTheme);
       return;
     }
 
-    const { pathname } = location;
+    // Load colors from image and apply theme
+    getAppThemeFromImage(songImage, isDark).then((scheme) => {
+      if (!scheme || Object.keys(scheme).length === 0) return;
 
-    // Dynamic import for older SolidJS + Vite versions
-    import('~/helpers/app-theme').then((module) => {
-      const scheme = module.getAppTheme(argb, isDark);
-      setElementVars(doc, colorsTheme, scheme);
+      setElementVars(document.documentElement, colorsTheme, scheme);
 
       if (titlebarElement) {
+        const { pathname } = location;
         titlebarElement.content =
-          pathname === '/player' ? scheme.secondaryContainer : scheme.surface;
+          pathname === '/player'
+            ? scheme.secondaryContainer
+            : scheme.surface;
       }
     });
   });
 
+  // Register service worker for updates
   registerServiceWorker({
     onNeedRefresh(updateSW) {
       toast({
@@ -68,5 +69,6 @@ export const useSetupApp = (): void => {
     },
   });
 
+  // Enable ripple effect for buttons
   installGlobalRipple(styles.interactable);
 };
