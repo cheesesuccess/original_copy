@@ -3,7 +3,7 @@ import {
   createGlobalTheme,
   createThemeContract,
 } from '@vanilla-extract/css'
-import { getAppTheme, argbFromHex } from '../helpers/app-theme'
+import { getAppThemeFromImage as getAppTheme, argbFromHex } from '../helpers/app-theme';
 
 const root = 'html'
 
@@ -71,3 +71,4 @@ export const vars = {
     ...sizesVars,
   },
 }
+
