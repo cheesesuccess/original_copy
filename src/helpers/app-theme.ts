@@ -1,4 +1,4 @@
-import Vibrant from 'node-vibrant';
+import ColorThief from 'color-thief-browser';
 import {
   blueFromArgb,
   greenFromArgb,
@@ -10,25 +10,34 @@ import {
 
 export { argbFromHex };
 
-/**
- * Extracts dominant color from an image and builds the theme palette
- */
 export const getAppThemeFromImage = async (imageUrl: string, isDark: boolean) => {
   try {
-    // Use Vibrant to get the dominant color from the image
-    const palette = await Vibrant.from(imageUrl).getPalette();
-    const dominantColor = palette?.Vibrant?.hex || '#6200EE'; // fallback to purple if no color found
+    // Create an image object for color extraction
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // Important for images from external URLs
+    img.src = imageUrl;
 
-    // Convert hex to ARGB
-    const argb = argbFromHex(dominantColor);
+    // Wait for image to load before extracting colors
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
 
-    // Generate Material color palette
-    const corePalette = CorePalette.of(argb);
+    // Extract dominant color using ColorThief
+    const colorThief = new ColorThief();
+    const [r, g, b] = colorThief.getColor(img);
+    const hexColor = `#${[r, g, b]
+      .map((x) => x.toString(16).padStart(2, '0'))
+      .join('')}`;
+
+    // Convert hex to ARGB and generate Material color palette
+    const argb = argbFromHex(hexColor);
+    const palette = CorePalette.of(argb);
 
     type PaletteKey = 'a1' | 'a2' | 'a3' | 'error' | 'n1' | 'n2';
     const getTone = (key: PaletteKey, tones: [light: number, dark: number]) => {
       const tone = isDark ? tones[1] : tones[0];
-      return corePalette[key].tone(tone);
+      return palette[key].tone(tone);
     };
 
     const getHexTone = (key: PaletteKey, tones: [light: number, dark: number]) =>
@@ -36,12 +45,9 @@ export const getAppThemeFromImage = async (imageUrl: string, isDark: boolean) =>
 
     const primaryArgb = getTone('a1', [40, 80]);
 
+    // Return Material-style theme object
     return {
-      primaryRgb: [
-        redFromArgb(primaryArgb),
-        greenFromArgb(primaryArgb),
-        blueFromArgb(primaryArgb),
-      ].toString(),
+      primaryRgb: [redFromArgb(primaryArgb), greenFromArgb(primaryArgb), blueFromArgb(primaryArgb)].toString(),
       primary: hexFromArgb(primaryArgb),
       onPrimary: getHexTone('a1', [100, 20]),
       primaryContainer: getHexTone('a1', [90, 30]),
@@ -70,7 +76,7 @@ export const getAppThemeFromImage = async (imageUrl: string, isDark: boolean) =>
       inversePrimary: getHexTone('a1', [80, 40]),
     } as const;
   } catch (error) {
-    console.error('Error extracting theme color:', error);
+    console.error('Error extracting theme color from image:', error);
     return {};
   }
 };
