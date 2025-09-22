@@ -1,6 +1,6 @@
 {
   "name": "osho_digital_library",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "A comprehensive digital library of Osho's teachings and discourses.",
   "scripts": {
     "dev": "vite",
