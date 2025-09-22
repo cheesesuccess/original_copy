@@ -12,7 +12,7 @@ series:
         name: "Kathopanishad 01"
         duration: 7043  # 01:57:23
         trackNo: 1
-        audioUrl: "/audio/kath_001.mp3"
+        audioUrl: "https://oshoworld.com/wp-content/uploads/2020/11/Hindi%20Audio/OSHO-Kathopanishad_08.mp3"
         description: "प्रथम वल्ली - ॐ उशन्‌ ह वै वाजश्रवसः सर्ववेदसं ददौ। तस्य ह नचिकेता नाम पुत्र आस।।1।। तंह कुमारं सन्तं दक्षिणासु नीयमानासु श्रद्धाऽऽविवेश सोऽमन्यत।।2।।"
         topics: ["kathopanishad", "upanishad", "meditation", "death", "naciketa"]
 
@@ -20,7 +20,7 @@ series:
         name: "Kathopanishad 02"
         duration: 4502  # 01:15:02
         trackNo: 2
-        audioUrl: "/audio/kath_002.mp3"
+        audioUrl: "https://oshoworld.com/wp-content/uploads/2020/11/Hindi%20Audio/OSHO-Kathopanishad_08.mp3"
         description: "येयं प्रेते विचिकित्सा मनुष्येऽस्तीत्येके नायमस्तीति चैके। एतद्विद्यामनुशिष्टस्त्वयाहं वराणामेष वरस्तृतीयः।।20।।"
         topics: ["kathopanishad", "death", "afterlife", "wisdom"]
 
@@ -28,7 +28,7 @@ series:
         name: "Kathopanishad 03"
         duration: 4774  # 01:19:34
         trackNo: 3
-        audioUrl: "/audio/kath_003.mp3"
+        audioUrl: "https://oshoworld.com/wp-content/uploads/2020/11/Hindi%20Audio/OSHO-Kathopanishad_08.mp3"
         description: "द्वितीय वल्ली - अन्यत्छ्रेयोऽन्यदुतैव प्रेयस्ते उभे नानार्थे पुरुषं सिनीतः। तयोः श्रेय आददानस्य साधु भवति हीयतेऽर्थाद्य उ प्रेयो वृणीते।।1।।"
         topics: ["kathopanishad", "choice", "pleasure", "good"]
 
