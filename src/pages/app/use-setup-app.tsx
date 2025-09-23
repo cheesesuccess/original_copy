@@ -1,57 +1,50 @@
-import { setElementVars } from '@vanilla-extract/dynamic';
-import { createEffect } from 'solid-js';
-import { useLocation } from 'solid-app-router';
-import { toast } from '~/components/toast/toast';
-import { usePeer } from '~/peer/create-peer';
-import { colorsTheme } from '~/styles/vars.css';
-import { useAudioPlayer } from '../../audio/create-audio-player';
-import { installGlobalRipple } from '../../helpers/ripple/install-global-ripple';
-import { usePlayerStore } from '../../stores/stores';
-import { registerServiceWorker } from '../../sw/register-sw';
-import { useDarkThemeEnabled } from '../../utils';
-import * as styles from './app.css';
+import { createEffect } from 'solid-js'
+import { setElementVars } from '@vanilla-extract/dynamic'
+import { registerServiceWorker } from '../../sw/register-sw'
+import { useAudioPlayer } from '../../audio/create-audio-player'
+import { usePlayerStore } from '../../stores/stores'
+import { installGlobalRipple } from '../../helpers/ripple/install-global-ripple'
+import { useDarkThemeEnabled } from '../../utils'
+import { colorsTheme } from '~/styles/vars.css'
+import * as styles from './app.css'
+import { toast } from '~/components/toast/toast'
 
 export const useSetupApp = (): void => {
-  useAudioPlayer();
-  usePeer();
+  useAudioPlayer()
 
-  const [playerState] = usePlayerStore();
-  const location = useLocation();
-  const isDarkTheme = useDarkThemeEnabled();
+  const [playerState] = usePlayerStore()
+
+  const isDarkTheme = useDarkThemeEnabled()
 
   const titlebarElement = document.querySelector(
-    'meta[name="theme-color"]'
-  ) as HTMLMetaElement;
+    'meta[name="theme-color"]',
+  ) as HTMLMetaElement
 
   createEffect(() => {
-    const isDark = isDarkTheme();
-    const argb = playerState.activeTrack?.primaryColor;
-    const doc = document.documentElement;
+    const isDark = isDarkTheme()
+    const argb = playerState.activeTrack?.primaryColor
 
-    if (!argb) {
-      // Reset theme if no primary color found
-      const emptyTheme: Record<string, string> = {};
-      Object.keys(colorsTheme).forEach((key) => {
-        emptyTheme[key] = '';
-      });
+    const doc = document.documentElement
 
-      setElementVars(doc, colorsTheme, emptyTheme);
-      return;
+    if (argb === undefined) {
+      type EmptyTheme = {
+        [key in keyof typeof colorsTheme]: string
+      }
+
+      const emptyTheme = Object.fromEntries(
+        Object.entries(colorsTheme).map(([key]) => [key, '']),
+      ) as EmptyTheme
+
+      setElementVars(doc, colorsTheme, emptyTheme)
+      return
     }
 
-    const { pathname } = location;
-
-    // Dynamic import for older SolidJS + Vite versions
     import('~/helpers/app-theme').then((module) => {
-      const scheme = module.getAppTheme(argb, isDark);
-      setElementVars(doc, colorsTheme, scheme);
-
-      if (titlebarElement) {
-        titlebarElement.content =
-          pathname === '/player' ? scheme.secondaryContainer : scheme.surface;
-      }
-    });
-  });
+      const scheme = module.getAppTheme(argb, isDark)
+      setElementVars(doc, colorsTheme, scheme)
+      titlebarElement.content = scheme.surface
+    })
+  })
 
   registerServiceWorker({
     onNeedRefresh(updateSW) {
@@ -61,12 +54,14 @@ export const useSetupApp = (): void => {
         controls: [
           {
             title: 'Reload',
-            action: () => updateSW(),
+            action: () => {
+              updateSW()
+            },
           },
         ],
-      });
+      })
     },
-  });
+  })
 
-  installGlobalRipple(styles.interactable);
-};
+  installGlobalRipple(styles.interactable)
+}
