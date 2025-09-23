@@ -1,6 +1,6 @@
 // src/firebase/firebase.ts
 import { initializeApp, getApps } from 'firebase/app'
-import { getAuth } from 'firebase/auth-v1'
+import { getAuth } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -14,5 +14,5 @@ const firebaseConfig = {
 }
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig)
-export const auth-v1 = getAuth(app)
+export const auth = getAuth(app)
 export default app
