@@ -8,12 +8,6 @@ import { mangleClassNames } from './lib/vite-mangle-classnames'
 import { injectScriptsToHtmlDuringBuild } from './lib/vite-inject-scripts-to-html'
 import { serviceWorker } from './lib/vite-service-worker'
 
-const createMScreenshot = (name: string, sizes: string) => ({
-  sizes,
-  src: `/screenshots/${name}.webp`,
-  type: 'image/webp',
-})
-
 export default defineConfig({
   base: '/',
   resolve: {
@@ -46,13 +40,13 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        // Disable vendor chunk.
-        manualChunks: undefined,
-        preferConst: true,
-        // Hash filenames for cache busting
+        // Cache busting filenames with hashes
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: 'assets/[name].[hash].[ext]',
+        // Disable vendor chunking
+        manualChunks: undefined,
+        preferConst: true,
       },
     },
   },
@@ -90,16 +84,16 @@ export default defineConfig({
           },
         ],
         screenshots: [
-          createMScreenshot('small_1', '1079x1919'),
-          createMScreenshot('small_2', '1079x1919'),
-          createMScreenshot('small_3', '1079x1919'),
-          createMScreenshot('medium_1', '1276x960'),
-          createMScreenshot('medium_2', '1276x960'),
-          createMScreenshot('medium_3', '1276x960'),
+          { sizes: '1079x1919', src: '/screenshots/small_1.webp', type: 'image/webp' },
+          { sizes: '1079x1919', src: '/screenshots/small_2.webp', type: 'image/webp' },
+          { sizes: '1079x1919', src: '/screenshots/small_3.webp', type: 'image/webp' },
+          { sizes: '1276x960', src: '/screenshots/medium_1.webp', type: 'image/webp' },
+          { sizes: '1276x960', src: '/screenshots/medium_2.webp', type: 'image/webp' },
+          { sizes: '1276x960', src: '/screenshots/medium_3.webp', type: 'image/webp' },
         ],
       },
     }),
-    // Custom plugin to inject the hashed main script into index.html
+    // Custom plugin to replace index.html's script src with hashed filename
     {
       name: 'html-transform',
       apply: 'build',
@@ -110,7 +104,7 @@ export default defineConfig({
           (chunk) => chunk.type === 'chunk' && chunk.isEntry
         );
         if (mainChunk) {
-          // Replace the placeholder script tag with the actual hashed filename
+          // Replace the script tag with the hashed filename
           html = html.replace(
             /<script\s+type='module'\s+src='\.\/src\/index\.ts'><\/script>/,
             `<script type='module' src='/assets/${mainChunk.file}'></script>`
@@ -120,4 +114,4 @@ export default defineConfig({
       },
     },
   ],
-});
+})
