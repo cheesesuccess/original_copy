@@ -3,7 +3,6 @@ import { defineConfig } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 import { createHtmlPlugin } from 'vite-plugin-html'
-// import { ViteWebfontDownload } from 'vite-plugin-webfont-dl' // Removed - no longer needed
 import manifest from './package.json'
 import { mangleClassNames } from './lib/vite-mangle-classnames'
 import { injectScriptsToHtmlDuringBuild } from './lib/vite-inject-scripts-to-html'
@@ -16,7 +15,6 @@ const createMScreenshot = (name: string, sizes: string) => ({
 })
 
 export default defineConfig({
-  // Set base path for GitHub Pages deployment
   base: '/',
   resolve: {
     alias: {
@@ -46,7 +44,6 @@ export default defineConfig({
         },
       },
     },
-    // Added cache busting filename patterns with hashes
     rollupOptions: {
       output: {
         // Disable vendor chunk.
@@ -60,22 +57,13 @@ export default defineConfig({
     },
   },
   plugins: [
-    createHtmlPlugin({
-      minify: true,
-    }),
-    // This plugin ensures scripts are injected correctly during build
+    createHtmlPlugin({ minify: true }),
     injectScriptsToHtmlDuringBuild({
       input: ['./src/disable-app-if-not-supported.ts'],
     }),
-    // If https://github.com/seek-oss/vanilla-extract/discussions/222 is ever implemented,
-    // this plugin can be replaced.
     mangleClassNames(),
     vanillaExtractPlugin(),
-    solidPlugin({
-      hot: false,
-    }),
-    // ViteWebfontDownload plugin removed to eliminate Google Fonts dependency
-    // Now using system fonts for better offline performance
+    solidPlugin({ hot: false }),
     serviceWorker({
       manifest: {
         short_name: 'Osho',
@@ -111,5 +99,25 @@ export default defineConfig({
         ],
       },
     }),
+    // Custom plugin to inject the hashed main script into index.html
+    {
+      name: 'html-transform',
+      apply: 'build',
+      enforce: 'post',
+      async transformIndexHtml(html, { bundle }) {
+        // Find the main entry chunk
+        const mainChunk = Object.values(bundle).find(
+          (chunk) => chunk.type === 'chunk' && chunk.isEntry
+        );
+        if (mainChunk) {
+          // Replace the placeholder script tag with the actual hashed filename
+          html = html.replace(
+            /<script\s+type='module'\s+src='\.\/src\/index\.ts'><\/script>/,
+            `<script type='module' src='/assets/${mainChunk.file}'></script>`
+          );
+        }
+        return html;
+      },
+    },
   ],
-})
+});
