@@ -52,22 +52,19 @@ jobs:
           DPO_COMPANY_TOKEN=${{ secrets.DPO_COMPANY_TOKEN }}
           EOF
 
-      # Clear any old artifacts to avoid stale files
       - name: Remove old dist
         run: rm -rf dist
 
       - name: Build fresh with cache-busting
         run: npm run build
 
-      - name: Add cache-busting meta tags to index.html
+      - name: Create cache-control headers for static assets
         run: |
-          sed -i 's|</head>|<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" /><meta http-equiv="Pragma" content="no-cache" /><meta http-equiv="Expires" content="0" /></head>|' dist/index.html
+          mkdir -p dist
+          echo "/assets/*" > dist/.headers
+          echo "cache-control: public, max-age=31536000, immutable" >> dist/.headers
 
-      - name: Upload artifact
+      - name: Upload artifact with headers
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
