@@ -24,7 +24,7 @@ export default defineConfig({
   },
 
   build: {
-    // ✅ Ensures all JS/CSS files have hashes in filenames for cache busting
+    //  Ensures all JS/CSS files have hashes in filenames for cache busting
     rollupOptions: {
       output: {
         entryFileNames: 'assets/[name].[hash].js',
@@ -38,3 +38,4 @@ export default defineConfig({
     port: 3000,
   },
 });
+
