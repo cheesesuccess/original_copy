@@ -1,41 +1,115 @@
-import path from 'node:path';
-import { defineConfig } from 'vite';
-import solidPlugin from 'vite-plugin-solid';
-import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
-import { createHtmlPlugin } from 'vite-plugin-html';
+import path from 'node:path'
+import { defineConfig } from 'vite'
+import solidPlugin from 'vite-plugin-solid'
+import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
+import { createHtmlPlugin } from 'vite-plugin-html'
+// import { ViteWebfontDownload } from 'vite-plugin-webfont-dl' // Removed - no longer needed
+import manifest from './package.json'
+import { mangleClassNames } from './lib/vite-mangle-classnames'
+import { injectScriptsToHtmlDuringBuild } from './lib/vite-inject-scripts-to-html'
+import { serviceWorker } from './lib/vite-service-worker'
+
+const createMScreenshot = (name: string, sizes: string) => ({
+  sizes,
+  src: `/screenshots/${name}.webp`,
+  type: 'image/webp',
+})
 
 export default defineConfig({
-  plugins: [
-    solidPlugin(),
-    vanillaExtractPlugin(),
-    createHtmlPlugin({
-      inject: {
-        data: {
-          title: 'My App',
-        },
-      },
-    }),
-  ],
-
+  // Set base path for GitHub Pages deployment
+  base: '/',
   resolve: {
     alias: {
-      '~': path.resolve(__dirname, 'src'),
+      '~': path.resolve(__dirname, './src'),
     },
   },
-
   build: {
-    //  Ensures all JS/CSS files have hashes in filenames for cache busting
+    target: 'esnext',
+    polyfillDynamicImport: false,
+    polyfillModulePreload: false,
+    cssCodeSplit: false,
+    minify: 'terser',
+    terserOptions: {
+      output: {
+        comments: false,
+      },
+      module: true,
+      compress: {
+        passes: 3,
+        unsafe_math: true,
+        unsafe_methods: true,
+        unsafe_arrows: true,
+      },
+      mangle: {
+        properties: {
+          regex: /^_/,
+        },
+      },
+    },
+    // Added cache busting filename patterns with hashes
     rollupOptions: {
       output: {
+        // Disable vendor chunk.
+        manualChunks: undefined,
+        preferConst: true,
+        // Hash filenames for cache busting
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
         assetFileNames: 'assets/[name].[hash].[ext]',
       },
     },
   },
-
-  server: {
-    port: 3000,
-  },
-});
-
+  plugins: [
+    createHtmlPlugin({
+      minify: true,
+    }),
+    // This plugin ensures scripts are injected correctly during build
+    injectScriptsToHtmlDuringBuild({
+      input: ['./src/disable-app-if-not-supported.ts'],
+    }),
+    // If https://github.com/seek-oss/vanilla-extract/discussions/222 is ever implemented,
+    // this plugin can be replaced.
+    mangleClassNames(),
+    vanillaExtractPlugin(),
+    solidPlugin({
+      hot: false,
+    }),
+    // ViteWebfontDownload plugin removed to eliminate Google Fonts dependency
+    // Now using system fonts for better offline performance
+    serviceWorker({
+      manifest: {
+        short_name: 'Osho',
+        name: 'Osho Digital Library',
+        start_url: './',
+        scope: './',
+        theme_color: '#1a1a1a',
+        background_color: '#1a1a1a',
+        display: 'standalone',
+        orientation: 'portrait',
+        description: manifest.description,
+        icons: [
+          {
+            src: '/icons/icon_responsive.svg',
+            type: 'image/svg+xml',
+            sizes: 'any',
+            purpose: 'any',
+          },
+          {
+            src: '/icons/icon_maskable.svg',
+            type: 'image/svg+xml',
+            sizes: 'any',
+            purpose: 'maskable',
+          },
+        ],
+        screenshots: [
+          createMScreenshot('small_1', '1079x1919'),
+          createMScreenshot('small_2', '1079x1919'),
+          createMScreenshot('small_3', '1079x1919'),
+          createMScreenshot('medium_1', '1276x960'),
+          createMScreenshot('medium_2', '1276x960'),
+          createMScreenshot('medium_3', '1276x960'),
+        ],
+      },
+    }),
+  ],
+})
