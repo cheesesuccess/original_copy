@@ -1,9 +1,9 @@
 import { RouteDefinition } from 'solid-app-router'
-import AuthPage-v1 from './auth-v1'
+import AuthPage from './auth'
 
 const authRoute: RouteDefinition = {
-  path: '/auth-v1',                           
-  component: AuthPage-v1,
+  path: '/auth',
+  component: AuthPage,
 }
 
-export default auth-v1Route
+export default authRoute
