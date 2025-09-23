@@ -1,15 +1,15 @@
 import { createSignal, Show } from 'solid-js'
 import * as s from './auth.css'
-import { auth } from '~/firebase/firebase'
+import { auth-v1 } from '~/firebase/firebase'
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
-} from 'firebase/auth'
+} from 'firebase/auth-v1'
 import { useNavigate } from 'solid-app-router'
 
-const AuthPage = () => {
+const AuthPage-v1 = () => {
   const navigate = useNavigate()
   const [mode, setMode] = createSignal<'login'|'signup'>('login')
   const [email, setEmail] = createSignal('')
@@ -98,4 +98,4 @@ const AuthPage = () => {
     </div>
   )
 }
-export default AuthPage
+export default AuthPage-v1
