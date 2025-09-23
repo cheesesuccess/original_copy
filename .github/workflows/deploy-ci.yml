@@ -29,7 +29,6 @@ jobs:
           cache: 'npm'
 
       - name: Generate lockfile from package.json
-        # Creates/updates package-lock.json in CI to match package.json
         run: npm install --package-lock-only
 
       - name: Clean install with npm ci
@@ -44,9 +43,9 @@ jobs:
           VITE_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
 
           VITE_DPO_DONATE_LINK=${{ secrets.DPO_DONATE_LINK }}
           VITE_DPO_SUBSCRIBE_LINK=${{ secrets.DPO_SUBSCRIBE_LINK }}
@@ -56,6 +55,12 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Create cache-control headers for static assets
+        run: |
+          mkdir -p dist
+          echo "/assets/*" > dist/.headers
+          echo "cache-control: public, max-age=31536000, immutable" >> dist/.headers
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
