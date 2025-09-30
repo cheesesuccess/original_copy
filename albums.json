@@ -1,0 +1,26 @@
+[
+  {
+    "_id": {
+      "$oid": "652f9c8c9b1234567890a100"
+    },
+    "name": "Safari Vibes",
+    "image": "https://my-bucket.s3.amazonaws.com/album1.jpg",
+    "artistIds": [
+      {
+        "$oid": "652f9d8e9b1234567890a001"
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "652f9c8c9b1234567890a101"
+    },
+    "name": "Night Beats",
+    "image": "https://my-bucket.s3.amazonaws.com/album2.jpg",
+    "artistIds": [
+      {
+        "$oid": "652f9d8e9b1234567890a002"
+      }
+    ]
+  }
+]

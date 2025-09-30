@@ -1,0 +1,16 @@
+[
+  {
+    "_id": {
+      "$oid": "652f9d8e9b1234567890a001"
+    },
+    "name": "Natasha Rockbell",
+    "image": "https://my-bucket.s3.amazonaws.com/artist1.jpg"
+  },
+  {
+    "_id": {
+      "$oid": "652f9d8e9b1234567890a002"
+    },
+    "name": "DJ Safari",
+    "image": "https://my-bucket.s3.amazonaws.com/artist2.jpg"
+  }
+]
