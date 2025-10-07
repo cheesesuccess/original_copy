@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: original_copy
+    env: static
+    buildCommand: ""
+    staticPublishPath: .
